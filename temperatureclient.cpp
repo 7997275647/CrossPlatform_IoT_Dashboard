@@ -50,9 +50,9 @@ void TemperatureClient::setPort(int port)
 
 void TemperatureClient::setTopic(const QString &topic)
 {
-    if (topic == m_topic)
+    if (topic == m_topic_1)
         return;
-    m_topic = topic;
+    m_topic_1 = topic;
     emit topicChanged();
 
     if (isConnected()) {
@@ -75,7 +75,7 @@ void TemperatureClient::disconnectFromBroker()
 
 void TemperatureClient::subscribe()
 {
-    m_subscription = m_client.subscribe(QMqttTopicFilter(m_topic), 0);
+    m_subscription = m_client.subscribe(QMqttTopicFilter(m_topic_1), 0);
     if (!m_subscription) {
         setStatus(QStringLiteral("Subscribe failed"));
         return;

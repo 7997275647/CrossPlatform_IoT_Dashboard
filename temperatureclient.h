@@ -26,7 +26,7 @@ public:
     int port() const { return m_client.port(); }
     void setPort(int port);
 
-    QString topic() const { return m_topic; }
+    QString topic() const { return m_topic_1; }
     void setTopic(const QString &topic);
 
     double temperature() const { return m_temperature; }
@@ -52,7 +52,7 @@ private:
 
     QMqttClient m_client;
     QMqttSubscription *m_subscription = nullptr;
-    QString m_topic = QStringLiteral("sensors/temperature");
+    QString m_topic_1 = QStringLiteral("sensors/temperature");
     double m_temperature = 0.0;
     bool m_hasValue = false;
     QString m_status = QStringLiteral("Disconnected");
