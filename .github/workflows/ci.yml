@@ -36,12 +36,12 @@ jobs:
           modules: qtshadertools
           cache: true
 
-      - name: Configure
-        run: >
-          cmake -S . -B build
-          -G Ninja
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      # - name: Configure
+      #   run: >
+      #     cmake -S . -B build
+      #     -G Ninja
+      #     -DCMAKE_BUILD_TYPE=Debug
+      #     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run QML static analysis
         run: |
