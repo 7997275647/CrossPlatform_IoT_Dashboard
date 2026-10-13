@@ -17,74 +17,61 @@ ApplicationWindow {
     property color reallyLight: "#e7e7e7"
     property color light: "#e0e0e0"
 
-    GridLayout {
-        id: grid
-        columns: width < 400 ? 1 : 2
-        rowSpacing: 0
-        columnSpacing: 0
+    TemperatureClient {
+        id: tempClient
+        hostname: hostField.text
+        port: parseInt(portField.text)
+        topic: topicField.text
+        Component.onCompleted: connectToBroker()
+    }
+
+    Rectangle {
+        id: rectangle1
         anchors.fill: parent
+        color: window.lightMode ? window.reallyLight : window.reallyDark
 
-        Rectangle {
-            id: rectangle1
-            color: window.lightMode ? window.reallyLight : window.reallyDark
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 16
+            spacing: 12
 
-            ColumnLayout {
-                anchors.fill: parent
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-
-                Label {
-                    id: text1
-                    color: window.lightMode ? window.dark : window.light
-                    font.pixelSize: 120
-                    fontSizeMode: Text.Fit
-                    text: qsTr("Sensor Data")
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.margins: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+            RowLayout {
+                Layout.fillWidth: true
+                TextField { id: hostField; text: "localhost"; placeholderText: qsTr("Broker"); Layout.fillWidth: true }
+                TextField { id: portField; text: "1883"; implicitWidth: 70; validator: IntValidator { bottom: 1; top: 65535 } }
+                Button {
+                    text: tempClient.connected ? qsTr("Disconnect") : qsTr("Connect")
+                    onClicked: tempClient.connected ? tempClient.disconnectFromBroker() : tempClient.connectToBroker()
                 }
             }
-        }
 
-        Rectangle {
-            id: rectangle2
-            color: window.lightMode ? window.light : window.dark
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            TextField { id: topicField; text: "sensors/temperature"; placeholderText: qsTr("Topic"); Layout.fillWidth: true }
 
-            ColumnLayout {
-                anchors.fill: parent
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Item { Layout.fillHeight: true }
 
-                Button {
-                    id: button1
-                    text: window.lightMode ? qsTr("\u263D  Dark mode")
-                                           : qsTr("\u263C  Light mode")
-                    Layout.bottomMargin: 16
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+            Label {
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("Temperature")
+                font.pixelSize: 20
+                color: window.lightMode ? window.dark : window.light
+            }
 
-                    contentItem: Text {
-                        text: button1.text
-                        color: window.lightMode ? window.light : window.dark
-                        font: button1.font
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+            Label {
+                Layout.alignment: Qt.AlignHCenter
+                text: tempClient.hasValue ? tempClient.temperature.toFixed(1) + " °C" : "--.- °C"
+                font.pixelSize: 64
+                font.bold: true
+                color: window.lightMode ? window.reallyDark : window.reallyLight
+            }
 
-                    background: Rectangle {
-                        implicitWidth: 120
-                        implicitHeight: 36
-                        radius: 8
-                        color: window.lightMode ? window.dark : window.light
-                    }
+            Item { Layout.fillHeight: true }
 
-                    onClicked: window.lightMode = !window.lightMode
-                }
+            Label {
+                text: tempClient.status
+                color: tempClient.connected ? "#3fa34d" : "#c0392b"
             }
         }
     }
-
 }
+
+        
