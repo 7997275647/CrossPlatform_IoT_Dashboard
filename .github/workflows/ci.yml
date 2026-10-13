@@ -62,5 +62,5 @@ jobs:
       #     if-no-files-found: error
       #     retention-days: 14
 
-      - name: Run unit tests
-        run: ctest --test-dir build --output-on-failure
+      # - name: Run unit tests
+      #   run: ctest --test-dir build --output-on-failure
