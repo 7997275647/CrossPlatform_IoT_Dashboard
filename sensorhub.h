@@ -1,24 +1,28 @@
 #pragma once
 
+#include "sensorchannel.h"
+
 #include <QObject>
+#include <QVariantList>
 #include <QtMqtt/QMqttClient>
 #include <QtQml/qqmlregistration.h>
 
-class TemperatureClient : public QObject
+// Connects to an MQTT broker, subscribes to <baseTopic>/temperature, /humidity and /gyro
+// and feeds the received data into one SensorChannel (last 1024 samples) per sensor.
+class SensorHub : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
 
     Q_PROPERTY(QString hostname READ hostname WRITE setHostname NOTIFY hostnameChanged)
     Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
-    Q_PROPERTY(QString topic READ topic WRITE setTopic NOTIFY topicChanged)
-    Q_PROPERTY(double temperature READ temperature NOTIFY temperatureChanged)
-    Q_PROPERTY(bool hasValue READ hasValue NOTIFY temperatureChanged)
+    Q_PROPERTY(QString baseTopic READ baseTopic WRITE setBaseTopic NOTIFY baseTopicChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QVariantList channels READ channels CONSTANT)
 
 public:
-    explicit TemperatureClient(QObject *parent = nullptr);
+    explicit SensorHub(QObject *parent = nullptr);
 
     QString hostname() const { return m_client.hostname(); }
     void setHostname(const QString &hostname);
@@ -26,13 +30,12 @@ public:
     int port() const { return m_client.port(); }
     void setPort(int port);
 
-    QString topic() const { return m_topic_1; }
-    void setTopic(const QString &topic);
+    QString baseTopic() const { return m_baseTopic; }
+    void setBaseTopic(const QString &baseTopic);
 
-    double temperature() const { return m_temperature; }
-    bool hasValue() const { return m_hasValue; }
     bool isConnected() const { return m_client.state() == QMqttClient::Connected; }
     QString status() const { return m_status; }
+    QVariantList channels() const { return m_channelList; }
 
     Q_INVOKABLE void connectToBroker();
     Q_INVOKABLE void disconnectFromBroker();
@@ -40,20 +43,21 @@ public:
 signals:
     void hostnameChanged();
     void portChanged();
-    void topicChanged();
-    void temperatureChanged();
+    void baseTopicChanged();
     void connectedChanged();
     void statusChanged();
 
 private:
-    void subscribe();
-    void handleMessage(const QByteArray &payload);
+    void applyTopics();
+    void subscribeAll();
+    void unsubscribeAll();
+    void handleMessage(const QByteArray &payload, const QMqttTopicName &topic);
     void setStatus(const QString &status);
 
     QMqttClient m_client;
-    QMqttSubscription *m_subscription = nullptr;
-    QString m_topic_1 = QStringLiteral("sensors/temperature");
-    double m_temperature = 0.0;
-    bool m_hasValue = false;
+    QList<SensorChannel *> m_channels;
+    QVariantList m_channelList;
+    QList<QMqttSubscription *> m_subscriptions;
+    QString m_baseTopic = QStringLiteral("sensors");
     QString m_status = QStringLiteral("Disconnected");
 };

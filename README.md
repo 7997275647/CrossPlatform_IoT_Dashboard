@@ -1,80 +1,34 @@
 # Qt Sensor Dashboard
+![Qt Sensor Dashboard](Documentation/Gui1.png)
+![Qt Sensor Dashboard](Documentation/Gui2.png)
+Qt 6.8+ / QML app that subscribes to MQTT sensor topics, keeps the **last 1024 samples per sensor**
+in memory and visualizes them (inspired by the SEBA Hydrocenter portal: latest-value tiles,
+time-series graphs, value tables, min/max/avg lines, CSV export).
 
-![Qt Sensor Dashboard](Documentation/gui.png)
+## Topics and payloads
 
-A small Qt 6 desktop dashboard that connects to an MQTT broker and displays the latest temperature value from a configured topic.
+With base topic `sensors` (editable in the UI):
 
-The app includes a simple control panel for the broker hostname, port, and MQTT topic, plus a live temperature readout and connection status. It accepts either a plain numeric payload such as `29.5` or a JSON payload like `{"temperature": 29.5}`.
+| Topic                 | Accepted payloads                                              |
+|-----------------------|----------------------------------------------------------------|
+| `sensors/temperature` | `23.5` or `{"temperature": 23.5}` (or `{"value": 23.5}`)       |
+| `sensors/humidity`    | `48.2` or `{"humidity": 48.2}` (or `{"value": 48.2}`)          |
+| `sensors/gyro`        | `{"x":1,"y":2,"z":3}`, `[1,2,3]` or `1,2,3`                    |
 
-## Features
-
-- Connect or disconnect from an MQTT broker
-- Enter broker host, port, and topic dynamically
-- Subscribe to a temperature topic
-- Display the latest temperature in Celsius
-- Show connection state and status text
-- Support both light and dark UI themes
-
-## Project structure
-
-- `Main.qml` — user interface and dashboard layout
-- `main.cpp` — Qt application entry point
-- `temperatureclient.h` — MQTT temperature client declaration
-- `temperatureclient.cpp` — MQTT connection, subscription, and payload parsing logic
-- `CMakeLists.txt` — CMake configuration for the Qt project
-
-## Requirements
-
-- Qt 6.8 or newer
-- CMake 3.16 or newer
-- Qt MQTT module (`Qt6::Mqtt`)
-- An MQTT broker such as Mosquitto
+Samples are timestamped on arrival. Once 1024 samples are stored, the oldest is dropped.
 
 ## Build
 
-From the project root:
+Requires Qt 6.8+ with the **Qt MQTT** module (`aqt install-qt ... -m qtmqtt`), CMake and a C++17 compiler.
 
-```bash
-cmake -S . -B build
-cmake --build build
-```
+    cmake -S . -B build -DCMAKE_PREFIX_PATH=<path-to-Qt>
+    cmake --build build
 
-On Windows, if Qt is installed in a custom location, make sure the Qt environment is configured before running CMake.
+## Try it
 
-## Run
+1. Start a broker, e.g. `mosquitto -v`.
+2. Start the simulator: `pip install paho-mqtt` then `python tools/simulate_sensors.py`.
+3. Run the app and press **Connect**.
 
-After building, run the generated application from the build output directory. For example:
-
-```bash
-./build/appQtSensorDash
-```
-
-or on Windows:
-
-```powershell
-.\build\appQtSensorDash.exe
-```
-
-## MQTT usage
-
-The default settings are:
-
-- Broker: `localhost`
-- Port: `1883`
-- Topic: `sensors/temperature`
-
-You can publish sensor data to the topic with either:
-
-```text
-29.5
-```
-
-or:
-
-```json
-{"temperature": 29.5}
-```
-
-## Notes
-
-This project is intended as a lightweight dashboard for monitoring a temperature sensor over MQTT and is easy to extend for additional sensor values or richer dashboard widgets.
+Code layout: `SensorChannel` (ring buffer + table model + stats + CSV export), `SensorHub`
+(MQTT client and topic routing), `SensorChart.qml` (Canvas line chart), `SensorTable.qml`, `Main.qml`.
