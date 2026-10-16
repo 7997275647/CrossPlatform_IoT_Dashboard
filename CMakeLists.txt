@@ -22,9 +22,13 @@ qt_add_qml_module(appQtSensorDash
     URI QtSensorDash
     QML_FILES
         Main.qml
+        SensorChart.qml
+        SensorTable.qml
     SOURCES
-        temperatureclient.h
-        temperatureclient.cpp
+        sensorchannel.h
+        sensorchannel.cpp
+        sensorhub.h
+        sensorhub.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
