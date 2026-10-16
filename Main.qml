@@ -152,7 +152,11 @@ ApplicationWindow {
             }
             Button {
                 text: qsTr("Clear")
-                onClicked: for (const ch of hub.channels) ch.clear()
+                onClicked: {
+                    for (const ch of hub.channels) {
+                        ch.clear()
+                    }
+                }
             }
         }
 

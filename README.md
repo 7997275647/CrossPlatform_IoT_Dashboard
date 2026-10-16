@@ -1,5 +1,6 @@
 # Qt Sensor Dashboard
-
+![Qt Sensor Dashboard](Documentation/Gui1.png)
+![Qt Sensor Dashboard](Documentation/Gui2.png)
 Qt 6.8+ / QML app that subscribes to MQTT sensor topics, keeps the **last 1024 samples per sensor**
 in memory and visualizes them (inspired by the SEBA Hydrocenter portal: latest-value tiles,
 time-series graphs, value tables, min/max/avg lines, CSV export).
