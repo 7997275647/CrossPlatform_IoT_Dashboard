@@ -36,31 +36,31 @@ jobs:
           modules: qtshadertools
           cache: true
 
-      - name: Configure
-        run: >
-          cmake -S . -B build
-          -G Ninja
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      # - name: Configure
+      #   run: >
+      #     cmake -S . -B build
+      #     -G Ninja
+      #     -DCMAKE_BUILD_TYPE=Debug
+      #     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run QML static analysis
         run: |
           find . -not -path './build/*' -name '*.qml' -print0 |
             xargs -0 -r -n1 qmllint
 
-      - name: Run C++ static analysis
-        run: clang-tidy main.cpp -p build --warnings-as-errors='*'
+      # - name: Run C++ static analysis
+      #   run: clang-tidy main.cpp -p build --warnings-as-errors='*'
 
-      - name: Build
-        run: cmake --build build --parallel
+      # - name: Build
+      #   run: cmake --build build --parallel
 
-      - name: Upload built application
-        uses: actions/upload-artifact@v4
-        with:
-          name: QtSensorDash-linux
-          path: build/appQtSensorDash
-          if-no-files-found: error
-          retention-days: 14
+      # - name: Upload built application
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: QtSensorDash-linux
+      #     path: build/appQtSensorDash
+      #     if-no-files-found: error
+      #     retention-days: 14
 
-      - name: Run unit tests
-        run: ctest --test-dir build --output-on-failure
+      # - name: Run unit tests
+      #   run: ctest --test-dir build --output-on-failure

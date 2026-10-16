@@ -1,5 +1,6 @@
 # CMake build directories
 build/
+Release_Folder/
 cmake-build-*/
 
 # Qt Creator and Qt tooling user-specific files
